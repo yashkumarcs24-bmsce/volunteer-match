@@ -20,7 +20,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ["https://volunteer-match-c6yg-cwnsd7axj-yashs-projects-cae7ec31.vercel.app"]
+      ? ["https://volunteer-match-c6yg-cwnsd7axj-yashs-projects-cae7ec31.vercel.app", "https://volunteer-match-c6yg-git-main-yashs-projects-cae7ec31.vercel.app"]
       : ["http://localhost:5173"],
     methods: ["GET", "POST"]
   }
@@ -29,7 +29,7 @@ const io = new Server(server, {
 /* Middleware */
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ["https://volunteer-match-c6yg-cwnsd7axj-yashs-projects-cae7ec31.vercel.app"]
+    ? ["https://volunteer-match-c6yg-cwnsd7axj-yashs-projects-cae7ec31.vercel.app", "https://volunteer-match-c6yg-git-main-yashs-projects-cae7ec31.vercel.app"]
     : ["http://localhost:5173"],
   credentials: true
 }));
