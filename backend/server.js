@@ -1,24 +1,80 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import { createServer } from "http";
+import { Server } from "socket.io";
+
+import adminRoutes from "./routes/admin.js";
+import authRoutes from "./routes/auth.js";
+import opportunityRoutes from "./routes/opportunities.js";
+import applicationRoutes from "./routes/applications.js";
+import userRoutes from "./routes/users.js";
+import messageRoutes from "./routes/messages.js";
+import uploadRoutes from "./routes/upload.js";
+
+dotenv.config();
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? ["https://your-frontend-url.vercel.app"]
+      : ["http://localhost:5173"],
+    methods: ["GET", "POST"]
+  }
+});
 
-app.use(cors());
-app.use(express.json());
+/* Middleware */
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ["https://your-frontend-url.vercel.app"]
+    : ["http://localhost:5173"],
+  credentials: true
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use('/uploads', express.static('uploads'));
 
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/opportunities", require("./routes/opportunities"));
-app.use("/api/applications", require("./routes/applications"));
+/* Socket.IO */
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  
+  socket.on('join', (userId) => {
+    socket.join(userId);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+/* Make io available to routes */
+app.set('io', io);
+
+/* Routes */
+app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/opportunities", opportunityRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/upload", uploadRoutes);
+
+/* Test route */
+app.get("/", (req, res) => {
+  res.send("Volunteer Match API is running 🚀");
+});
+
+/* DB + Server */
+const PORT = process.env.PORT || 8000;
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("MongoDB connected");
-    app.listen(8000, () => console.log("Server running on port 8000"));
+    console.log("✅ MongoDB connected");
+    server.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   })
-  .catch((err) => console.error(err));
-
-
-
-
+  .catch((err) => console.error("❌ MongoDB error:", err));

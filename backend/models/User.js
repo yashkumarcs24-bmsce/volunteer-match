@@ -1,10 +1,31 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['volunteer', 'org'], default: 'volunteer' }
-});
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: { type: String, unique: true },
+    password: String,
+    role: {
+      type: String,
+      enum: ["volunteer", "org", "admin"],
+      default: "volunteer",
+    },
+    bio: String,
+    skills: [String],
+    experience: String,
+    location: String,
+    phone: String,
+    avatar: String,
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('User', UserSchema);
+// Search optimization indexes
+userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ skills: 1 });
+userSchema.index({ location: 1 });
+
+export default mongoose.model("User", userSchema);
