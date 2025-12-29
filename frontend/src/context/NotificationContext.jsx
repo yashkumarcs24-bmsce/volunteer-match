@@ -112,33 +112,45 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const markAsRead = (notificationId) => {
-    setNotifications(prev => 
-      prev.map(n => 
+    try {
+      setNotifications(prev => 
+        prev.map(n => 
+          n.id === notificationId ? { ...n, read: true } : n
+        )
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      
+      // Update localStorage
+      const updated = notifications.map(n => 
         n.id === notificationId ? { ...n, read: true } : n
-      )
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-    
-    // Update localStorage
-    const updated = notifications.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    );
-    localStorage.setItem(`notifications_${user._id}`, JSON.stringify(updated));
+      );
+      localStorage.setItem(`notifications_${user._id}`, JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    setUnreadCount(0);
-    
-    // Update localStorage
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    localStorage.setItem(`notifications_${user._id}`, JSON.stringify(updated));
+    try {
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+      
+      // Update localStorage
+      const updated = notifications.map(n => ({ ...n, read: true }));
+      localStorage.setItem(`notifications_${user._id}`, JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
   };
 
   const clearNotifications = () => {
-    setNotifications([]);
-    setUnreadCount(0);
-    localStorage.removeItem(`notifications_${user._id}`);
+    try {
+      setNotifications([]);
+      setUnreadCount(0);
+      localStorage.removeItem(`notifications_${user._id}`);
+    } catch (error) {
+      console.error('Failed to clear notifications:', error);
+    }
   };
 
   const getNotificationIcon = (type) => {

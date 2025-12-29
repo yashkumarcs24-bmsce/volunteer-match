@@ -22,7 +22,7 @@ export default function EmailVerification() {
   const verifyEmail = async (verificationToken) => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/verify-email", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: verificationToken }),
@@ -52,7 +52,7 @@ export default function EmailVerification() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/resend-verification", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

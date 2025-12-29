@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiFilter, FiX } from "react-icons/fi";
 
 export default function AdvancedSearch({ 
@@ -46,11 +46,11 @@ export default function AdvancedSearch({
     onFilter(filters);
   }, [filters, onFilter]);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = useCallback((key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const addSkillFilter = () => {
+  const addSkillFilter = useCallback(() => {
     if (newSkill.trim() && !filters.skills.includes(newSkill.trim())) {
       setFilters(prev => ({
         ...prev,
@@ -58,16 +58,16 @@ export default function AdvancedSearch({
       }));
       setNewSkill("");
     }
-  };
+  }, [newSkill, filters.skills]);
 
-  const removeSkillFilter = (skill) => {
+  const removeSkillFilter = useCallback((skill) => {
     setFilters(prev => ({
       ...prev,
       skills: prev.skills.filter(s => s !== skill)
     }));
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({
       category: "",
       location: "",
@@ -77,18 +77,21 @@ export default function AdvancedSearch({
       dateRange: ""
     });
     setSearchTerm("");
-  };
+  }, []);
 
-  const clearSearchHistory = () => {
+  const clearSearchHistory = useCallback(() => {
     setSearchHistory([]);
     localStorage.removeItem('searchHistory');
-  };
+  }, []);
 
-  const useHistorySearch = (term) => {
+  const useHistorySearch = useCallback((term) => {
     setSearchTerm(term);
-  };
+  }, []);
 
-  const hasActiveFilters = filters.category || filters.location || filters.deadline || filters.skills.length > 0 || filters.dateRange;
+  const hasActiveFilters = useMemo(() => 
+    filters.category || filters.location || filters.deadline || filters.skills.length > 0 || filters.dateRange,
+    [filters]
+  );
 
   return (
     <div className="advanced-search">
@@ -234,7 +237,7 @@ export default function AdvancedSearch({
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
                     placeholder="Filter by skills..."
-                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillFilter())}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkillFilter())}
                   />
                   <button type="button" className="btn btn-secondary btn-sm" onClick={addSkillFilter}>
                     Add

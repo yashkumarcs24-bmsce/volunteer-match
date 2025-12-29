@@ -1,3 +1,12 @@
+const SpinnerRings = () => (
+  <>
+    <div className="spinner-ring"></div>
+    <div className="spinner-ring"></div>
+    <div className="spinner-ring"></div>
+    <div className="spinner-ring"></div>
+  </>
+);
+
 export default function LoadingSpinner({ 
   size = "medium", 
   color = "primary", 
@@ -19,15 +28,14 @@ export default function LoadingSpinner({
     info: "spinner-info"
   };
 
+  const spinnerClass = `loading-spinner ${sizeClasses[size]} ${colorClasses[color]}`;
+
   if (fullScreen) {
     return (
       <div className="loading-overlay">
         <div className="loading-content">
-          <div className={`loading-spinner ${sizeClasses[size]} ${colorClasses[color]}`}>
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
+          <div className={spinnerClass}>
+            <SpinnerRings />
           </div>
           {text && <p className="loading-text">{text}</p>}
         </div>
@@ -37,11 +45,8 @@ export default function LoadingSpinner({
 
   return (
     <div className="loading-inline">
-      <div className={`loading-spinner ${sizeClasses[size]} ${colorClasses[color]}`}>
-        <div className="spinner-ring"></div>
-        <div className="spinner-ring"></div>
-        <div className="spinner-ring"></div>
-        <div className="spinner-ring"></div>
+      <div className={spinnerClass}>
+        <SpinnerRings />
       </div>
       {text && <span className="loading-text">{text}</span>}
     </div>

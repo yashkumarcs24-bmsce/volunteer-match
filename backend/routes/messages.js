@@ -105,12 +105,13 @@ router.post("/send", auth, async (req, res) => {
     await message.save();
     await message.populate("senderId receiverId", "name avatar");
     
-    // Send real-time notification
-    const io = req.app.get('io');
-    io.to(receiverId).emit('new_message', message);
+    // Send real-time notification (disabled for serverless)
+    // const io = req.app.get('io');
+    // io.to(receiverId).emit('new_message', message);
     
     res.status(201).json(message);
   } catch (err) {
+    console.error('Error sending message:', err);
     res.status(500).json({ message: "Failed to send message" });
   }
 });
@@ -129,6 +130,7 @@ router.put("/read/:conversationId", auth, async (req, res) => {
     
     res.json({ success: true });
   } catch (err) {
+    console.error('Error marking messages as read:', err);
     res.status(500).json({ message: "Failed to mark as read" });
   }
 });

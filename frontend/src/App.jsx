@@ -36,7 +36,7 @@ function PrivateRoute({ children }) {
     );
   }
 
-  if (!user || user === false) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 

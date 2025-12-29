@@ -9,7 +9,7 @@ export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
+    password: "", // nosemgrep: empty initial form field, not a credential
     role: "volunteer"
   });
   const [loading, setLoading] = useState(false);

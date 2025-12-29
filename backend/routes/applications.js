@@ -67,8 +67,8 @@ router.post("/", authMiddleware, async (req, res) => {
 
     res.status(201).json(application);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Apply failed" });
+    console.error('Error applying for opportunity:', err);
+    res.status(500).json({ message: "Apply failed", error: err.message });
   }
 });
 
@@ -96,6 +96,7 @@ router.get("/volunteer/:id", authMiddleware, async (req, res) => {
 
     res.json(fixed);
   } catch (err) {
+    console.error('Error fetching applications:', err);
     res.status(500).json({ message: "Fetch failed" });
   }
 });
@@ -124,7 +125,8 @@ router.put("/cancel/:id", authMiddleware, async (req, res) => {
     await app.save();
     res.json(app);
   } catch (err) {
-    res.status(500).json({ message: "Cancel failed" });
+    console.error('Error in cancel application:', err);
+    res.status(500).json({ message: "Cancel failed", error: err.message });
   }
 });
 
@@ -202,6 +204,7 @@ router.get("/", authMiddleware, async (req, res) => {
 
     res.json(applications);
   } catch (err) {
+    console.error('Error fetching applications:', err);
     res.status(500).json({ message: err.message });
   }
 });
@@ -220,6 +223,7 @@ router.put("/notifications/read/:id", authMiddleware, async (req, res) => {
 
     res.json({ message: "Notifications marked as read" });
   } catch (err) {
+    console.error('Error marking notifications as read:', err);
     res.status(500).json({ message: "Failed to mark notifications" });
   }
 });

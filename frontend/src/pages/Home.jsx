@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Home() {
@@ -11,7 +11,7 @@ export default function Home() {
   const [isVisible, setIsVisible] = useState({});
   const [expandedFeature, setExpandedFeature] = useState(null);
 
-  const testimonials = [
+  const testimonials = useMemo(() => [
     {
       name: "Sarah Johnson",
       role: "Environmental Volunteer",
@@ -33,23 +33,23 @@ export default function Home() {
       avatar: "ER",
       rating: 5
     }
-  ];
+  ], []);
 
-  const impactStats = [
+  const impactStats = useMemo(() => [
     { icon: "🌍", number: "50+", label: "Cities Served", color: "#22c55e" },
     { icon: "🏆", number: "95%", label: "Success Rate", color: "#f59e0b" },
     { icon: "⭐", number: "4.9", label: "User Rating", color: "#8b5cf6" },
     { icon: "🚀", number: "24/7", label: "Support", color: "#06b6d4" }
-  ];
+  ], []);
 
-  const categories = [
+  const categories = useMemo(() => [
     { icon: "🌱", title: "Environment", count: "120+ opportunities", color: "#22c55e" },
     { icon: "📚", title: "Education", count: "85+ opportunities", color: "#3b82f6" },
     { icon: "❤️", title: "Healthcare", count: "95+ opportunities", color: "#ef4444" },
     { icon: "🏠", title: "Community", count: "150+ opportunities", color: "#f59e0b" },
     { icon: "🎨", title: "Arts & Culture", count: "60+ opportunities", color: "#8b5cf6" },
     { icon: "🐾", title: "Animal Welfare", count: "45+ opportunities", color: "#06b6d4" }
-  ];
+  ], []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,33 +58,32 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
-  const toggleFeatureDetails = (featureType) => {
+  const toggleFeatureDetails = useCallback((featureType) => {
     setExpandedFeature(expandedFeature === featureType ? null : featureType);
-  };
+  }, [expandedFeature]);
 
-  const featureDetails = {
+  const featureDetails = useMemo(() => ({
     matching: "Our AI-powered matching system analyzes your skills, interests, location, and availability to connect you with the most relevant volunteer opportunities. We consider factors like your experience level, preferred causes, and time commitment to ensure every match is meaningful.",
     applications: "Skip the paperwork! Our streamlined application process lets you apply to multiple opportunities with just one click. Your profile information is automatically shared with organizations, and you'll receive instant confirmation and updates on your application status.",
     tracking: "See the real difference you're making! Track your volunteer hours, view impact metrics, earn achievement badges, and get detailed reports on your contributions. Share your volunteer journey and inspire others to join the cause."
-  };
+  }), []);
+
+  const observerCallback = useCallback((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        setIsVisible(prev => ({ ...prev, [entry.target.id]: true }));
+      }
+    });
+  }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(prev => ({ ...prev, [entry.target.id]: true }));
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+    const observer = new IntersectionObserver(observerCallback, { threshold: 0.1 });
 
     const elements = document.querySelectorAll('[data-animate]');
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [observerCallback]);
 
   return (
     <div className={`page ${dark ? "dark" : ""}`}>

@@ -41,6 +41,14 @@ router.get("/notifications", auth, adminOnly, async (req, res) => {
 /* ---------------- MARK ALL ADMIN NOTIFICATIONS READ ---------------- */
 router.put("/notifications/read", auth, adminOnly, async (req, res) => {
   try {
+    // CSRF protection - verify request origin
+    const origin = req.get('Origin') || req.get('Referer');
+    const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173'];
+    
+    if (origin && !allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      return res.status(403).json({ message: "Forbidden: Invalid origin" });
+    }
+
     await Application.updateMany(
       { "notifications.read": false },
       { $set: { "notifications.$[].read": true } }

@@ -2,8 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import { createServer } from "http";
-import { Server } from "socket.io";
 
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
@@ -16,41 +14,16 @@ import uploadRoutes from "./routes/upload.js";
 dotenv.config();
 
 const app = express();
-const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? true
-      : ["http://localhost:5173"],
-    methods: ["GET", "POST"]
-  }
-});
 
 /* Middleware */
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? true
+    ? [process.env.FRONTEND_URL, "https://volunteer-match-frontend.up.railway.app"]
     : ["http://localhost:5173"],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static('uploads'));
-
-/* Socket.IO */
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  
-  socket.on('join', (userId) => {
-    socket.join(userId);
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
-});
-
-/* Make io available to routes */
-app.set('io', io);
 
 /* Routes */
 app.use("/api/admin", adminRoutes);
@@ -66,15 +39,18 @@ app.get("/", (req, res) => {
   res.send("Volunteer Match API is running 🚀");
 });
 
-/* DB + Server */
-const PORT = process.env.PORT || 8000;
+/* DB Connection */
+if (!mongoose.connection.readyState) {
+  mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ MongoDB connected"))
+    .catch((err) => console.error("❌ MongoDB error:", err));
+}
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    server.listen(PORT, () =>
-      console.log(`🚀 Server running on port ${PORT}`)
-    );
-  })
-  .catch((err) => console.error("❌ MongoDB error:", err));
+/* Start server */
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+export default app;

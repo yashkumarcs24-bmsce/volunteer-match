@@ -49,7 +49,7 @@ export default function OpportunityCard({
 
         {skills.length > 0 && (
           <div className="card-skills">
-            <label>Required Skills:</label>
+            <span>Required Skills:</span>
             <div className="skills-list">
               {skills.slice(0, 3).map((skill, index) => (
                 <span key={index} className="skill-chip">{skill}</span>

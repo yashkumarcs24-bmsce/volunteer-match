@@ -52,7 +52,7 @@ class ErrorBoundary extends Component {
               <details className="error-details">
                 <summary>Error Details (Development Only)</summary>
                 <pre className="error-stack">
-                  {this.state.error && this.state.error.toString()}
+                  {this.state.error?.toString()}
                   <br />
                   {this.state.errorInfo.componentStack}
                 </pre>
