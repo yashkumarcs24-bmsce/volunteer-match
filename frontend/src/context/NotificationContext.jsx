@@ -12,30 +12,35 @@ export const NotificationProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (user && token) {
-      const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:8000");
-      
-      newSocket.emit('join', user._id);
-      
-      newSocket.on('notification', (notification) => {
-        addNotification(notification);
-      });
-      
-      newSocket.on('new_message', (message) => {
-        addNotification({
-          type: 'new_message',
-          title: 'New Message 💬',
-          message: `New message from ${message.senderId.name}`,
-          userId: user._id
-        });
-      });
-      
-      setSocket(newSocket);
-      loadNotifications();
+    // Temporarily disable Socket.IO for deployment
+    // if (user && token) {
+    //   const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:8000");
+    //   
+    //   newSocket.emit('join', user._id);
+    //   
+    //   newSocket.on('notification', (notification) => {
+    //     addNotification(notification);
+    //   });
+    //   
+    //   newSocket.on('new_message', (message) => {
+    //     addNotification({
+    //       type: 'new_message',
+    //       title: 'New Message 💬',
+    //       message: `New message from ${message.senderId.name}`,
+    //       userId: user._id
+    //     });
+    //   });
+    //   
+    //   setSocket(newSocket);
+    //   loadNotifications();
 
-      return () => {
-        newSocket.disconnect();
-      };
+    //   return () => {
+    //     newSocket.disconnect();
+    //   };
+    // }
+    
+    if (user) {
+      loadNotifications();
     }
   }, [user, token]);
 
